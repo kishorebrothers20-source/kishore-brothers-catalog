@@ -77,10 +77,58 @@ export default function AdminDashboardPage() {
     'dashboard' | 'products' | 'companies' | 'categories' | 'therapies' | 'media' | 'settings'
   >('dashboard');
 
-  const [productsList, setProductsList] = useState<Product[]>(MOCK_PRODUCTS);
-  const [companiesList, setCompaniesList] = useState(MOCK_COMPANIES);
-  const [categoriesList, setCategoriesList] = useState(MOCK_CATEGORIES);
-  const [therapiesList, setTherapiesList] = useState(MOCK_THERAPIES);
+  const [productsList, setProductsList] = useState<Product[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('kb_products');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch (e) {}
+      }
+    }
+    return MOCK_PRODUCTS;
+  });
+
+  const [companiesList, setCompaniesList] = useState<Company[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('kb_companies');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch (e) {}
+      }
+    }
+    return MOCK_COMPANIES;
+  });
+
+  const [categoriesList, setCategoriesList] = useState<Category[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('kb_categories');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch (e) {}
+      }
+    }
+    return MOCK_CATEGORIES;
+  });
+
+  const [therapiesList, setTherapiesList] = useState<Therapy[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('kb_therapies');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch (e) {}
+      }
+    }
+    return MOCK_THERAPIES;
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -89,65 +137,23 @@ export default function AdminDashboardPage() {
       if (localStorage.getItem('kb_admin_authed') === 'true') {
         setIsAuthenticated(true);
       }
-
-      const savedProducts = localStorage.getItem('kb_products');
-      if (savedProducts) {
-        try {
-          const parsed = JSON.parse(savedProducts);
-          if (Array.isArray(parsed) && parsed.length > 0) setProductsList(parsed);
-        } catch (e) {}
-      }
-
-      const savedCompanies = localStorage.getItem('kb_companies');
-      if (savedCompanies) {
-        try {
-          const parsed = JSON.parse(savedCompanies);
-          if (Array.isArray(parsed) && parsed.length > 0) setCompaniesList(parsed);
-        } catch (e) {}
-      }
-
-      const savedCategories = localStorage.getItem('kb_categories');
-      if (savedCategories) {
-        try {
-          const parsed = JSON.parse(savedCategories);
-          if (Array.isArray(parsed) && parsed.length > 0) setCategoriesList(parsed);
-        } catch (e) {}
-      }
-
-      const savedTherapies = localStorage.getItem('kb_therapies');
-      if (savedTherapies) {
-        try {
-          const parsed = JSON.parse(savedTherapies);
-          if (Array.isArray(parsed) && parsed.length > 0) setTherapiesList(parsed);
-        } catch (e) {}
-      }
     }
   }, []);
 
-  // Save changes to localStorage whenever lists update
+  // Save changes to localStorage whenever any list updates
+  const isFirstRender = React.useRef(true);
   useEffect(() => {
-    if (hasMounted && typeof window !== 'undefined') {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (typeof window !== 'undefined') {
       localStorage.setItem('kb_products', JSON.stringify(productsList));
-    }
-  }, [productsList, hasMounted]);
-
-  useEffect(() => {
-    if (hasMounted && typeof window !== 'undefined') {
       localStorage.setItem('kb_companies', JSON.stringify(companiesList));
-    }
-  }, [companiesList, hasMounted]);
-
-  useEffect(() => {
-    if (hasMounted && typeof window !== 'undefined') {
       localStorage.setItem('kb_categories', JSON.stringify(categoriesList));
-    }
-  }, [categoriesList, hasMounted]);
-
-  useEffect(() => {
-    if (hasMounted && typeof window !== 'undefined') {
       localStorage.setItem('kb_therapies', JSON.stringify(therapiesList));
     }
-  }, [therapiesList, hasMounted]);
+  }, [productsList, companiesList, categoriesList, therapiesList]);
 
   // Modal States
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
