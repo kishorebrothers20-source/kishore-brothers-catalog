@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Product, Category, Therapy, Company } from '@/types/catalog';
 import { SearchBar } from '@/components/ui/SearchBar';
@@ -26,6 +26,45 @@ export function ProductsClientView({
 }: ProductsClientViewProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Dynamic Catalog State (Synced with localStorage when present)
+  const [productsList, setProductsList] = useState<Product[]>(initialProducts);
+  const [categoriesList, setCategoriesList] = useState<Category[]>(categories);
+  const [therapiesList, setTherapiesList] = useState<Therapy[]>(therapies);
+  const [companiesList, setCompaniesList] = useState<Company[]>(companies);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedProds = localStorage.getItem('kb_products');
+      if (savedProds) {
+        try {
+          const parsed = JSON.parse(savedProds);
+          if (Array.isArray(parsed) && parsed.length > 0) setProductsList(parsed);
+        } catch (e) {}
+      }
+      const savedCats = localStorage.getItem('kb_categories');
+      if (savedCats) {
+        try {
+          const parsed = JSON.parse(savedCats);
+          if (Array.isArray(parsed) && parsed.length > 0) setCategoriesList(parsed);
+        } catch (e) {}
+      }
+      const savedThers = localStorage.getItem('kb_therapies');
+      if (savedThers) {
+        try {
+          const parsed = JSON.parse(savedThers);
+          if (Array.isArray(parsed) && parsed.length > 0) setTherapiesList(parsed);
+        } catch (e) {}
+      }
+      const savedComps = localStorage.getItem('kb_companies');
+      if (savedComps) {
+        try {
+          const parsed = JSON.parse(savedComps);
+          if (Array.isArray(parsed) && parsed.length > 0) setCompaniesList(parsed);
+        } catch (e) {}
+      }
+    }
+  }, []);
 
   // Search & Filter State synchronized with URL
   const currentSearch = searchParams.get('search') || '';
@@ -58,7 +97,7 @@ export function ProductsClientView({
 
   // Filtered & Sorted Products
   const processedProducts = useMemo(() => {
-    let result = [...initialProducts];
+    let result = [...productsList];
 
     // Search filter
     if (currentSearch) {
@@ -73,30 +112,30 @@ export function ProductsClientView({
 
     // Company filter
     if (currentCompany) {
-      result = result.filter(p => p.company.slug === currentCompany);
+      result = result.filter(p => p.company?.slug === currentCompany);
     }
 
     // Category filter
     if (currentCategory) {
-      result = result.filter(p => p.category.slug === currentCategory);
+      result = result.filter(p => p.category?.slug === currentCategory);
     }
 
     // Therapy filter
     if (currentTherapy) {
-      result = result.filter(p => p.therapy.slug === currentTherapy);
+      result = result.filter(p => p.therapy?.slug === currentTherapy);
     }
 
     // Sorting
     result.sort((a, b) => {
       if (sortBy === 'name-asc') return a.name.localeCompare(b.name);
       if (sortBy === 'name-desc') return b.name.localeCompare(a.name);
-      if (sortBy === 'company') return a.company.name.localeCompare(b.company.name);
-      if (sortBy === 'category') return a.category.name.localeCompare(b.category.name);
+      if (sortBy === 'company') return (a.company?.name || '').localeCompare(b.company?.name || '');
+      if (sortBy === 'category') return (a.category?.name || '').localeCompare(b.category?.name || '');
       return 0;
     });
 
     return result;
-  }, [initialProducts, currentSearch, currentCompany, currentCategory, currentTherapy, sortBy]);
+  }, [productsList, currentSearch, currentCompany, currentCategory, currentTherapy, sortBy]);
 
   // Pagination Math
   const totalPages = Math.ceil(processedProducts.length / ITEMS_PER_PAGE);
@@ -199,7 +238,7 @@ export function ProductsClientView({
                 <span>All Companies</span>
                 {!currentCompany && <Check className="w-3.5 h-3.5" />}
               </button>
-              {companies.map(comp => {
+              {companiesList.map(comp => {
                 const isSelected = currentCompany === comp.slug;
                 return (
                   <button
@@ -233,7 +272,7 @@ export function ProductsClientView({
                 <span>All Categories</span>
                 {!currentCategory && <Check className="w-3.5 h-3.5" />}
               </button>
-              {categories.map(cat => {
+              {categoriesList.map(cat => {
                 const isSelected = currentCategory === cat.slug;
                 return (
                   <button
@@ -267,7 +306,7 @@ export function ProductsClientView({
                 <span>All Therapies</span>
                 {!currentTherapy && <Check className="w-3.5 h-3.5" />}
               </button>
-              {therapies.map(ther => {
+              {therapiesList.map(ther => {
                 const isSelected = currentTherapy === ther.slug;
                 return (
                   <button
@@ -336,7 +375,7 @@ export function ProductsClientView({
             <div className="space-y-2">
               <h4 className="text-xs font-bold text-slate-700 uppercase">Company</h4>
               <div className="space-y-1 text-xs">
-                {companies.map(comp => (
+                {companiesList.map(comp => (
                   <button
                     key={comp.id}
                     onClick={() => {
@@ -357,7 +396,7 @@ export function ProductsClientView({
             <div className="space-y-2 pt-4 border-t border-[#E2ECF3]">
               <h4 className="text-xs font-bold text-slate-700 uppercase">Category</h4>
               <div className="space-y-1 text-xs">
-                {categories.map(cat => (
+                {categoriesList.map(cat => (
                   <button
                     key={cat.id}
                     onClick={() => {
@@ -378,7 +417,7 @@ export function ProductsClientView({
             <div className="space-y-2 pt-4 border-t border-[#E2ECF3]">
               <h4 className="text-xs font-bold text-slate-700 uppercase">Therapy</h4>
               <div className="space-y-1 text-xs">
-                {therapies.map(ther => (
+                {therapiesList.map(ther => (
                   <button
                     key={ther.id}
                     onClick={() => {

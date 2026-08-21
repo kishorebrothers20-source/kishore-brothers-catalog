@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Category } from '@/types/catalog';
 import { ShieldAlert, HeartPulse, Dna, Activity, Brain, Wind, ArrowRight, Layers, Pill, Syringe, Droplet } from 'lucide-react';
@@ -6,7 +9,21 @@ interface CategoryGridProps {
   categories: Category[];
 }
 
-export function CategoryGrid({ categories }: CategoryGridProps) {
+export function CategoryGrid({ categories: initialCategories }: CategoryGridProps) {
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('kb_categories');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) setCategories(parsed);
+        } catch (e) {}
+      }
+    }
+  }, []);
+
   const getCategoryIcon = (slug: string) => {
     if (slug.includes('injectable') || slug.includes('vials')) return <Syringe className="w-6 h-6 text-[#2D9CDB]" />;
     if (slug.includes('infusion') || slug.includes('suspension')) return <Droplet className="w-6 h-6 text-teal-600" />;

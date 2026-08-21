@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Therapy } from '@/types/catalog';
 import { Container } from '@/components/ui/Container';
@@ -9,7 +12,21 @@ interface BrowseByTherapyProps {
   therapies: Therapy[];
 }
 
-export function BrowseByTherapy({ therapies }: BrowseByTherapyProps) {
+export function BrowseByTherapy({ therapies: initialTherapies }: BrowseByTherapyProps) {
+  const [therapies, setTherapies] = useState<Therapy[]>(initialTherapies);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('kb_therapies');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) setTherapies(parsed);
+        } catch (e) {}
+      }
+    }
+  }, []);
+
   const getTherapyIcon = (slug: string) => {
     if (slug.includes('anti-infectives')) return <ShieldAlert className="w-6 h-6 text-[#0B6E4F]" />;
     if (slug.includes('oncology')) return <Dna className="w-6 h-6 text-purple-600" />;

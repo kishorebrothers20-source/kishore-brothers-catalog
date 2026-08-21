@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Company } from '@/types/catalog';
 import { Container } from '@/components/ui/Container';
@@ -9,7 +12,21 @@ interface BrowseByCompanyProps {
   companies: Company[];
 }
 
-export function BrowseByCompany({ companies }: BrowseByCompanyProps) {
+export function BrowseByCompany({ companies: initialCompanies }: BrowseByCompanyProps) {
+  const [companies, setCompanies] = useState<Company[]>(initialCompanies);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('kb_companies');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) setCompanies(parsed);
+        } catch (e) {}
+      }
+    }
+  }, []);
+
   return (
     <section className="py-16 bg-[#F4F8FB] border-b border-[#E2ECF3]">
       <Container size="lg">

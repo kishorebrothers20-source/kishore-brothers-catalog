@@ -1006,23 +1006,30 @@ export default function AdminDashboardPage() {
                 size="sm"
                 onClick={() => {
                   if (newCompanyName.trim()) {
+                    const newName = newCompanyName.trim();
+                    const newSlug = newName.toLowerCase().replace(/\s+/g, '-');
+
                     if (editingCompany) {
                       setCompaniesList(prev =>
                         prev.map(c =>
                           c.id === editingCompany.id
-                            ? {
-                                ...c,
-                                name: newCompanyName.trim(),
-                                slug: newCompanyName.trim().toLowerCase().replace(/\s+/g, '-'),
-                              }
+                            ? { ...c, name: newName, slug: newSlug }
                             : c
+                        )
+                      );
+                      // Cascade to products referencing this company
+                      setProductsList(prev =>
+                        prev.map(p =>
+                          p.company?.id === editingCompany.id || p.company?.slug === editingCompany.slug
+                            ? { ...p, company: { ...p.company, id: editingCompany.id, name: newName, slug: newSlug } }
+                            : p
                         )
                       );
                     } else {
                       const createdCompany = {
                         id: `comp-${Date.now()}`,
-                        name: newCompanyName.trim(),
-                        slug: newCompanyName.trim().toLowerCase().replace(/\s+/g, '-'),
+                        name: newName,
+                        slug: newSlug,
                         productCount: 0,
                       };
                       setCompaniesList(prev => [...prev, createdCompany]);
@@ -1074,23 +1081,30 @@ export default function AdminDashboardPage() {
                 size="sm"
                 onClick={() => {
                   if (newCategoryName.trim()) {
+                    const newName = newCategoryName.trim();
+                    const newSlug = newName.toLowerCase().replace(/\s+/g, '-');
+
                     if (editingCategory) {
                       setCategoriesList(prev =>
                         prev.map(c =>
                           c.id === editingCategory.id
-                            ? {
-                                ...c,
-                                name: newCategoryName.trim(),
-                                slug: newCategoryName.trim().toLowerCase().replace(/\s+/g, '-'),
-                              }
+                            ? { ...c, name: newName, slug: newSlug }
                             : c
+                        )
+                      );
+                      // Cascade to products referencing this category
+                      setProductsList(prev =>
+                        prev.map(p =>
+                          p.category?.id === editingCategory.id || p.category?.slug === editingCategory.slug
+                            ? { ...p, category: { ...p.category, id: editingCategory.id, name: newName, slug: newSlug } }
+                            : p
                         )
                       );
                     } else {
                       const createdCat = {
                         id: `cat-${Date.now()}`,
-                        name: newCategoryName.trim(),
-                        slug: newCategoryName.trim().toLowerCase().replace(/\s+/g, '-'),
+                        name: newName,
+                        slug: newSlug,
                         productCount: 0,
                       };
                       setCategoriesList(prev => [...prev, createdCat]);
@@ -1142,23 +1156,30 @@ export default function AdminDashboardPage() {
                 size="sm"
                 onClick={() => {
                   if (newTherapyName.trim()) {
+                    const newName = newTherapyName.trim();
+                    const newSlug = newName.toLowerCase().replace(/\s+/g, '-');
+
                     if (editingTherapy) {
                       setTherapiesList(prev =>
                         prev.map(t =>
                           t.id === editingTherapy.id
-                            ? {
-                                ...t,
-                                name: newTherapyName.trim(),
-                                slug: newTherapyName.trim().toLowerCase().replace(/\s+/g, '-'),
-                              }
+                            ? { ...t, name: newName, slug: newSlug }
                             : t
+                        )
+                      );
+                      // Cascade to products referencing this therapy
+                      setProductsList(prev =>
+                        prev.map(p =>
+                          p.therapy?.id === editingTherapy.id || p.therapy?.slug === editingTherapy.slug
+                            ? { ...p, therapy: { ...p.therapy, id: editingTherapy.id, name: newName, slug: newSlug } }
+                            : p
                         )
                       );
                     } else {
                       const createdTher = {
                         id: `ther-${Date.now()}`,
-                        name: newTherapyName.trim(),
-                        slug: newTherapyName.trim().toLowerCase().replace(/\s+/g, '-'),
+                        name: newName,
+                        slug: newSlug,
                         productCount: 0,
                       };
                       setTherapiesList(prev => [...prev, createdTher]);
