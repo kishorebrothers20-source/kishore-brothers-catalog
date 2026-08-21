@@ -1,11 +1,17 @@
+'use client';
+
+import { useMemo } from 'react';
 import { Product } from '@/types/catalog';
 import { Package, Info, Building2, Beaker, Layers, HeartPulse } from 'lucide-react';
+import { getResolvedProduct } from '@/lib/catalogResolver';
 
 interface SpecificationTableProps {
   product: Product;
 }
 
-export function SpecificationTable({ product }: SpecificationTableProps) {
+export function SpecificationTable({ product: rawProduct }: SpecificationTableProps) {
+  const product = useMemo(() => getResolvedProduct(rawProduct), [rawProduct]);
+
   return (
     <div className="bg-white border border-[#E2ECF3] rounded-3xl overflow-hidden shadow-sm">
       <div className="bg-[#E8F5F1] px-6 py-4 border-b border-[#0B6E4F]/20 flex items-center justify-between">
@@ -41,7 +47,7 @@ export function SpecificationTable({ product }: SpecificationTableProps) {
             Company
           </span>
           <span className="sm:col-span-2 font-semibold text-slate-800">
-            {product.company.name}
+            {product.company?.name || 'Company'}
           </span>
         </div>
 
@@ -51,7 +57,7 @@ export function SpecificationTable({ product }: SpecificationTableProps) {
             Category
           </span>
           <span className="sm:col-span-2 text-slate-900 font-medium">
-            {product.category.name}
+            {product.category?.name || 'Category'}
           </span>
         </div>
 
@@ -61,7 +67,7 @@ export function SpecificationTable({ product }: SpecificationTableProps) {
             Therapy Area
           </span>
           <span className="sm:col-span-2 text-[#2D9CDB] font-semibold">
-            {product.therapy.name}
+            {product.therapy?.name || 'Therapy'}
           </span>
         </div>
 

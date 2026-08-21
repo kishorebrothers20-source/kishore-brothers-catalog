@@ -1,17 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Product } from '@/types/catalog';
 import { Card } from '@/components/ui/Card';
 import { ArrowRight, Beaker, Building2, Pill } from 'lucide-react';
+import { getResolvedProduct } from '@/lib/catalogResolver';
 
 interface ProductCardProps {
   product: Product;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product: rawProduct }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
+
+  // Dynamically resolve product attributes against live company/category/therapy state
+  const product = useMemo(() => getResolvedProduct(rawProduct), [rawProduct]);
 
   return (
     <Link href={`/products/${product.slug}`} className="block h-full group">
@@ -25,14 +29,14 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="absolute top-3 left-3 z-10 max-w-[55%]">
             <span className="text-[10px] font-bold text-slate-700 bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-full border border-[#E2ECF3] shadow-2xs truncate flex items-center gap-1">
               <Building2 className="w-3 h-3 text-[#0B6E4F] flex-shrink-0" />
-              <span className="truncate">{product.company.name}</span>
+              <span className="truncate">{product.company?.name || 'Company'}</span>
             </span>
           </div>
 
           {/* Top Right: Category Tag */}
           <div className="absolute top-3 right-3 z-10 max-w-[40%]">
             <span className="text-[10px] font-bold text-[#0B6E4F] bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-full border border-[#0B6E4F]/20 shadow-2xs truncate block">
-              {product.category.name}
+              {product.category?.name || 'Category'}
             </span>
           </div>
 
@@ -89,7 +93,7 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Footer Action Bar */}
           <div className="pt-3 border-t border-[#E2ECF3] flex items-center justify-between gap-2">
             <span className="text-[11px] font-semibold text-[#2D9CDB] truncate max-w-[65%]">
-              {product.therapy.name}
+              {product.therapy?.name || 'Therapy'}
             </span>
 
             <span className="text-xs font-bold text-[#0B6E4F] flex items-center gap-1 group-hover:translate-x-1 transition-transform flex-shrink-0">

@@ -11,6 +11,7 @@ import { ProductFormModal } from '@/components/admin/ProductFormModal';
 import { BulkImportModal } from '@/components/admin/BulkImportModal';
 import { MOCK_PRODUCTS, MOCK_COMPANIES, MOCK_CATEGORIES, MOCK_THERAPIES } from '@/lib/db/catalog';
 import { Product, Company, Category, Therapy } from '@/types/catalog';
+import { getResolvedProduct } from '@/lib/catalogResolver';
 import {
   LayoutDashboard,
   Pill,
@@ -600,17 +601,20 @@ export default function AdminDashboardPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#E2ECF3]">
-                        {productsList.slice(0, 5).map(p => (
-                          <tr key={p.id} className="hover:bg-[#F4F8FB]">
-                            <td className="py-3 font-bold text-slate-900">{p.name}</td>
-                            <td className="py-3 font-mono text-[#0B6E4F]">{p.salt || 'N/A'}</td>
-                            <td className="py-3 font-semibold text-slate-700">{p.company.name}</td>
-                            <td className="py-3 text-slate-500">{p.category.name}</td>
-                            <td className="py-3 text-right">
-                              <Badge variant="success">Active</Badge>
-                            </td>
-                          </tr>
-                        ))}
+                        {productsList.slice(0, 5).map(rawP => {
+                          const p = getResolvedProduct(rawP);
+                          return (
+                            <tr key={p.id} className="hover:bg-[#F4F8FB]">
+                              <td className="py-3 font-bold text-slate-900">{p.name}</td>
+                              <td className="py-3 font-mono text-[#0B6E4F]">{p.salt || 'N/A'}</td>
+                              <td className="py-3 font-semibold text-slate-700">{p.company?.name || 'Company'}</td>
+                              <td className="py-3 text-slate-500">{p.category?.name || 'Category'}</td>
+                              <td className="py-3 text-right">
+                                <Badge variant="success">Active</Badge>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -677,35 +681,38 @@ export default function AdminDashboardPage() {
                               p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                               (p.salt && p.salt.toLowerCase().includes(searchQuery.toLowerCase()))
                           )
-                          .map(p => (
-                            <tr key={p.id} className="hover:bg-[#F4F8FB]">
-                              <td className="py-3 font-bold text-slate-900">{p.name}</td>
-                              <td className="py-3 font-mono text-[#0B6E4F]">{p.salt || 'N/A'}</td>
-                              <td className="py-3 text-slate-600">
-                                <span className="font-mono font-bold block">{p.strength}</span>
-                                <span className="text-[10px] text-slate-400">{p.pack}</span>
-                              </td>
-                              <td className="py-3 font-semibold text-slate-700">{p.company.name}</td>
-                              <td className="py-3 text-right">
-                                <div className="flex items-center justify-end gap-2">
-                                  <button
-                                    onClick={() => handleOpenEditProduct(p)}
-                                    className="p-1.5 rounded-lg text-slate-500 hover:text-[#0B6E4F] hover:bg-emerald-50 transition-colors"
-                                    title="Edit Product"
-                                  >
-                                    <Edit className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteProduct(p.id)}
-                                    className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                                    title="Delete Product"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
+                          .map(rawP => {
+                            const p = getResolvedProduct(rawP);
+                            return (
+                              <tr key={p.id} className="hover:bg-[#F4F8FB]">
+                                <td className="py-3 font-bold text-slate-900">{p.name}</td>
+                                <td className="py-3 font-mono text-[#0B6E4F]">{p.salt || 'N/A'}</td>
+                                <td className="py-3 text-slate-600">
+                                  <span className="font-mono font-bold block">{p.strength}</span>
+                                  <span className="text-[10px] text-slate-400">{p.pack}</span>
+                                </td>
+                                <td className="py-3 font-semibold text-slate-700">{p.company?.name || 'Company'}</td>
+                                <td className="py-3 text-right">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <button
+                                      onClick={() => handleOpenEditProduct(rawP)}
+                                      className="p-1.5 rounded-lg text-slate-500 hover:text-[#0B6E4F] hover:bg-emerald-50 transition-colors"
+                                      title="Edit Product"
+                                    >
+                                      <Edit className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteProduct(rawP.id)}
+                                      className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                                      title="Delete Product"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
                       </tbody>
                     </table>
                   </div>
