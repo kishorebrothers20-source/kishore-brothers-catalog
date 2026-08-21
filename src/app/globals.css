@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  --color-pharma-primary: #0B6E4F;
+  --color-pharma-primary-dark: #074B36;
+  --color-pharma-primary-light: #E8F5F1;
+  --color-pharma-secondary: #F4F8FB;
+  --color-pharma-secondary-dark: #E2ECF3;
+  --color-pharma-accent: #2D9CDB;
+  --color-pharma-accent-dark: #1E7EBA;
+  --color-pharma-accent-light: #EBF5FB;
+
+  --shadow-soft: 0 4px 20px -2px rgba(11, 110, 79, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+  --shadow-card: 0 10px 30px -4px rgba(11, 110, 79, 0.08), 0 4px 12px -2px rgba(45, 156, 219, 0.04);
+  --shadow-card-hover: 0 20px 40px -6px rgba(11, 110, 79, 0.14), 0 8px 20px -4px rgba(45, 156, 219, 0.08);
+}
+
+@layer base {
+  :root {
+    --pharma-primary: #0B6E4F;
+    --pharma-secondary: #F4F8FB;
+    --pharma-accent: #2D9CDB;
+  }
+
+  body {
+    background-color: #F4F8FB;
+    color: #1E293B;
+    font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Custom Utilities for Pharmaceutical Design System */
+.bg-pharma-primary {
+  background-color: #0B6E4F;
+}
+.bg-pharma-primary-hover:hover {
+  background-color: #08563E;
+}
+.bg-pharma-primary-light {
+  background-color: #E8F5F1;
+}
+
+.bg-pharma-secondary {
+  background-color: #F4F8FB;
+}
+.bg-pharma-accent {
+  background-color: #2D9CDB;
+}
+.bg-pharma-accent-light {
+  background-color: #EBF5FB;
+}
+
+.text-pharma-primary {
+  color: #0B6E4F;
+}
+.text-pharma-accent {
+  color: #2D9CDB;
+}
+
+.border-pharma-primary {
+  border-color: #0B6E4F;
+}
+.border-pharma-secondary {
+  border-color: #E2ECF3;
+}
+.border-pharma-accent {
+  border-color: #2D9CDB;
+}
+
+.shadow-pharma-soft {
+  box-shadow: var(--shadow-soft);
+}
+.shadow-pharma-card {
+  box-shadow: var(--shadow-card);
+}
+.shadow-pharma-hover {
+  box-shadow: var(--shadow-card-hover);
+}

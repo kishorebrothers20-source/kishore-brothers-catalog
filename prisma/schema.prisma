@@ -1,0 +1,90 @@
+// This is your Prisma schema file for PostgreSQL integration
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  logo      String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([slug])
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([slug])
+}
+
+model Therapy {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([slug])
+}
+
+model Product {
+  id          String         @id @default(uuid())
+  name        String
+  slug        String         @unique
+  image       String?
+  salt        String?        // Active Pharmaceutical Ingredient / Chemical Salt Composition
+  description String
+  strength    String?        // e.g. "625mg", "10mg/ml", "500mg"
+  pack        String?        // e.g. "Alu-Alu Blister 10x10", "100ml Infusion Bottle"
+  
+  // Foreign Keys
+  companyId   String
+  company     Company        @relation(fields: [companyId], references: [id])
+  categoryId  String
+  category    Category       @relation(fields: [categoryId], references: [id])
+  therapyId   String
+  therapy     Therapy        @relation(fields: [therapyId], references: [id])
+
+  isFeatured  Boolean        @default(false)
+  inquiries   ContactInquiry[]
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([slug])
+  @@index([companyId])
+  @@index([categoryId])
+  @@index([therapyId])
+}
+
+model ContactInquiry {
+  id          String    @id @default(uuid())
+  name        String
+  email       String
+  company     String
+  country     String
+  phone       String?
+  subject     String
+  message     String
+  productSlug String?
+  product     Product?  @relation(fields: [productSlug], references: [slug])
+  status      String    @default("PENDING") // PENDING, REVIEWED, CONTACTED
+  createdAt   DateTime  @default(now())
+}
